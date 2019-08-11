@@ -1,4 +1,4 @@
-import random, os, configparser, logging, threadin, time
+import random, os, configparser, logging, threadin
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level = logging.INFO)
@@ -14,17 +14,42 @@ def winer(x):
         updater.message.reply_text('間諜獲勝！')
     if x == 'c'
         updater.message.reply_text('平民獲勝！')
-
     if x == 'cw':
         updater.message.reply_text('平民與白板獲勝！')
 
 ###檢查有沒有說過話###
 def check_id(bot,update):
+    t = 1
     for i in range(len(players_role)):
         if players_role[i]['id'] == update.message.from_user.id:
-            alive[i] = 1
+            speack[i] = 1
             break
-            
+
+    for i in range(len(speak)):
+        if speack[i] == 0:
+            t = 0
+            break
+    if t == 1:
+        updater.message.reply_text('TIME UP!回合結束！/n'.format(run))
+        vote(bot,update)
+        speack = [0 for i in range(len(players_role))]
+        run += 1
+    civilian = 0
+    spy = 0
+    whiteboard = 0                                                  
+    for i in range(len(players_role)):
+        if players_role[i]['role'] == '平民':
+            civilian += 1
+        if players_role[i]['role'] == '間諜':
+            spy += 1
+        if players_role[i]['role'] == '白板':
+            whiteboard += 1
+    if civilian == 0 and whiteboard == 0:
+        def winer('spy') 
+    if spy == 0 and civilian == 0:
+        def winer('c')
+    if spy == 0:
+        def winer('cw')
 
 ###分配角色###
 def change_rote(gameDetails,players_id):
@@ -49,59 +74,30 @@ def change_rote(gameDetails,players_id):
     return players_role
 
 
-
-
 ########遊戲開始########
 gameDetails = gameDetails()#遊戲定義
 players_id = []#取id
+run = 0#回合數
 if i in range(len(gameDetails][players])):
     players_id.append(list(gameDetails[players][i].keys())[0])#list(a[0].keys())[0]
 
 players_name = []#取name
 if i in range(len(gameDetails][players])):
     players_name.append(list(gameDetails[players][i].keys())[1])
-    
-alive = [0 for i in range(len(players_name))]#0 alive,1 die
+
+for i in range(len(players_id)):
+    alive.append(i)
+
 players_role = change_role(gameDetails,players_id)#角色設定
 
-run = 0#回合數
+
 
 updater = Updater(token)#reading bot data
 updater.message.reply_text('現在是第 {} 回合 ！/n大家請開始序述自己的角色'.format(run))
 check_temp = [0 for i in range(len(players_role))]#是否說過話
-while True:
-    time_start, time_end= time.time(), 0
-    while time_end-time_start >= 45:# countdowna
-        updater.dispatcher.add_handler(MessageHandler((Filters.text, check_id)'''設爲已說話'''
-        time_end = time.time()
-        t = 1
-        for i in range(len(alive)):
-            if alive[i] == 0:
-                t = 0
-             break
-        if t == 1:
-            break                                                                                      
-    run += 1
-    updater.message.reply_text('TIME UP!回合結束！/n'.format(run))
-    '''vote()'''                                    
-                                                  
-    #判斷遊戲是是否結束
-    civilian = 0
-    spy = 0
-    whiteboard = 0                                                  
-    for i in range(len(players_role)):
-        if players_role[i]['role'] == '平民':
-            civilian += 1
-        if players_role[i]['role'] == '間諜':
-            spy += 1
-        if players_role[i]['role'] == '白板':
-            whiteboard += 1
-    if civilian == 0 and whiteboard == 0:
-        def winer('spy') 
-    if spy == 0 and civilian == 0:
-        def winer('c')
-    if spy == 0:
-        def winer('cw')
 
+updater.dispatcher.add_handler(MessageHandler((Filters.text, check_id)'''設爲已說話'''
+                           
 updater.start_polling()
 updater.idel()
+
